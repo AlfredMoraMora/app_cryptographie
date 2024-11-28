@@ -1,3 +1,5 @@
+import hashlib
+
 def hasher_mots(mots: list[str]) -> dict:
     """
     Fonction qui reçoit une livre de mots et qui génère les hash md5, sha256 et sha512 de chaque mot à
@@ -8,6 +10,8 @@ def hasher_mots(mots: list[str]) -> dict:
     :return: Le dictionnaire généré contenant les hash de chaque mot
     """
     hash_dict = {}
+    for mot in mots:
+        hash_dict[mot] = [hashlib.md5(mot.encode()).hexdigest(), hashlib.sha256(mot.encode()).hexdigest(), hashlib.sha512(mot.encode()).hexdigest()]
 
     # TODO: Complétez cette fonction pour qu'elle génère un dictionnaire contenant les 3 hash demandés (md5, sha256, sha512)
     #   pour chacun des mots dans la liste des mots non chiffrés fournie dans le programme principal.
@@ -23,12 +27,33 @@ def chiffrement_cesar(chaine: str, nb_cesar: int) -> str:
     :param nb_cesar: Le nombre de rotations à faire pour le chiffrement.
     :return: La chaine chiffrée résultante
     """
-    caracteres_remplacement = "abcdefghijklmnopqrstuvwxyz"
-    chaine_chiffree = ""
+    caracteres = "abcdefghijklmnopqrstuvwxyz"
+    chaine_chiffre = ""
+
+    for char in chaine:
+        i = caracteres.index(char)
+        nouvel_index = i + nb_cesar
+        if nouvel_index >= len(caracteres):
+            nouvel_index = nouvel_index - len(caracteres)
+        nouvelle_lettre = caracteres[nouvel_index]
+        chaine_chiffre += nouvelle_lettre
+    return chaine_chiffre
 
     # TODO: à l'aide des caractères de remplacement, du nombre de César et de la chaine originale, faire le chiffrement
     #   de césar et retournez la chaîne ainsi générée
 
+def find_match(liste, dictionnaire):
+    decrypted_words = []
+    for hash_item in liste:
+        match_found = False
+        for key, value in dictionnaire.items():
+            if hash_item in value:
+                decrypted_words.append(key)
+                match_found = True
+                break # Move to next hash item to decrypt once a match is found
+        if not match_found:
+            decrypted_words.append("No match found for this hash.")
+    return decrypted_words
 
 
 
@@ -64,3 +89,38 @@ if __name__ == '__main__':
         '95b7aa774ee5d86302c89ef3bc6e3fcd',
         '059f79fbb20a17eb6c7dc12883fb6105eca60071034ac32ae201a57762020e07'
     ]
+    # Create the dictionary
+    dict_mots = hasher_mots(mots_aleatoires)
+
+    # Find matches
+    result = find_match(mots_hash, dict_mots)
+
+    # Output results
+    for hash_item, decrypted in zip(mots_hash, result):
+        print(f"Hash: {hash_item} -> Word: {decrypted}")
+
+
+    # for i in dict_mots.items():
+    #     print(i)
+
+
+
+    # match = find_match(mots_hash, dict_mots)
+    # if match:
+    #     print(f"Match trouvé dans clé: {match}")
+    # else:
+    #     print("pas de match trouvé. ")
+
+
+    n = int(input("Enter a number from 1 to 25: "))
+    nb_cesar = n
+    print(chiffrement_cesar(mots_cesar[0], nb_cesar))
+
+
+    
+    # values = dict_mots.values()
+    # keys = dict_mots.keys()
+    # items = dict_mots.items()
+
+
+
